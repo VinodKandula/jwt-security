@@ -1,2 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.example.jwtsecurityautoconfigure.JwtSecurityAutoConfiguration
+
+#org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer=\
+#  com.example.jwt.filter.JwtHttpSecurityConfigurer

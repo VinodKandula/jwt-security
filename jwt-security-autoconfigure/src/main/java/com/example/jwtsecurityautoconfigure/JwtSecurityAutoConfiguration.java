@@ -1,6 +1,5 @@
 package com.example.jwtsecurityautoconfigure;
 
-import com.example.jwt.filter.JwtHelper;
 import com.example.jwt.filter.JwtSecurityProperties;
 import com.example.jwt.filter.JwtTokenFilter;
 import com.example.jwt.rest.JwtRestTemplateCustomizer;
@@ -19,13 +18,8 @@ public class JwtSecurityAutoConfiguration {
     }
 
     @Bean
-    public JwtHelper jwtHelper() {
-        return new JwtHelper(jwtSecurityProperties);
-    }
-
-    @Bean
-    public JwtTokenFilter jwtTokenFilter(JwtHelper jwtHelper) {
-        return new JwtTokenFilter(jwtHelper);
+    public JwtTokenFilter jwtTokenFilter() {
+        return new JwtTokenFilter(jwtSecurityProperties);
     }
 
     @Bean
