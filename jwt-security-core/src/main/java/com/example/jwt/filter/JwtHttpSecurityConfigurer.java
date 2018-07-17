@@ -15,6 +15,8 @@ public class JwtHttpSecurityConfigurer extends AbstractHttpConfigurer<JwtHttpSec
 
     @Override
     public void init(HttpSecurity http) throws Exception {
+        // any method that adds another configurer
+        // must be done in the init method
         http.authorizeRequests()
                 .anyRequest().authenticated()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
