@@ -16,6 +16,7 @@ public class JwtAuthorizationInterceptor implements ClientHttpRequestInterceptor
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("--- Propagated Authentication: " + auth.getName() + " " + auth.getCredentials() + " " + auth.getAuthorities());
         if (auth != null && auth instanceof UsernamePasswordAuthenticationToken) {
             request.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + auth.getCredentials());
         }

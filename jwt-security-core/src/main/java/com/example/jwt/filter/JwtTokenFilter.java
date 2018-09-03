@@ -34,7 +34,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 throw new JwtException("missing jwt token");
             }
             Claims claims = obtainClaims(token);
-            Authentication authentication = new UsernamePasswordAuthenticationToken(claims.getSubject(), "", getAuthorities(claims));
+            Authentication authentication = new UsernamePasswordAuthenticationToken(claims.getSubject(), token, getAuthorities(claims));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (JwtException e) {
             SecurityContextHolder.clearContext();
@@ -46,8 +46,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     public String obtainToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
+        System.out.println("--- Authorization header:" + bearerToken);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7, bearerToken.length());
+            return bearerToken.substring(7);
         }
         return null;
     }
