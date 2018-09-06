@@ -8,17 +8,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JwtTokenFilter extends OncePerRequestFilter {
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+
+public class JwtTokenFilter extends GenericFilterBean  {
 
     private JwtSecurityProperties jwtSecurityProperties;
 
@@ -26,9 +30,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         this.jwtSecurityProperties = jwtSecurityProperties;
     }
 
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        String token = obtainToken(request);
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        System.out.println("--- I was called... " + Thread.currentThread().getName());
+        String token = obtainToken((HttpServletRequest) request);
         try {
             if (token == null) {
                 throw new JwtException("missing jwt token");
@@ -37,11 +43,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             Authentication authentication = new UsernamePasswordAuthenticationToken(claims.getSubject(), token, getAuthorities(claims));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (JwtException e) {
-            SecurityContextHolder.clearContext();
-            //response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            ((HttpServletResponse) response).setStatus(SC_UNAUTHORIZED);
         }
 
         chain.doFilter(request, response);
+        SecurityContextHolder.clearContext();
     }
 
     public String obtainToken(HttpServletRequest request) {
@@ -61,4 +67,5 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         List<String> authorities = claims.get("authorities", List.class);
         return authorities.stream().map((role) -> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
     }
+
 }
