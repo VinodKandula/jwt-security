@@ -1,34 +1,23 @@
 package com.example.jwt.filter;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 public class JwtHttpSecurityConfigurer extends AbstractHttpConfigurer<JwtHttpSecurityConfigurer, HttpSecurity> {
 
-    private JwtSecurityProperties jwtSecurityProperties;
-
-    public JwtHttpSecurityConfigurer(JwtSecurityProperties jwtSecurityProperties) {
-        this.jwtSecurityProperties = jwtSecurityProperties;
-    }
-
-    @Override
-    public void init(HttpSecurity http) throws Exception {
-        // any method that adds another configurer
-        // must be done in the init method
-        http.authorizeRequests()
-                .anyRequest().authenticated()
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    }
-
     @Override
     public void configure(HttpSecurity http) {
+        ApplicationContext applicationContext = http.getSharedObject(ApplicationContext.class);
+
+        JwtSecurityProperties jwtSecurityProperties = applicationContext.getBean(JwtSecurityProperties.class);
+
         http.addFilterBefore(new JwtTokenFilter(jwtSecurityProperties), UsernamePasswordAuthenticationFilter.class);
     }
 
-    public static JwtHttpSecurityConfigurer jwt(JwtSecurityProperties jwtSecurityProperties) {
-        return new JwtHttpSecurityConfigurer(jwtSecurityProperties);
+    public static JwtHttpSecurityConfigurer jwt() {
+        return new JwtHttpSecurityConfigurer();
     }
 
 }
